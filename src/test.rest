@@ -1,0 +1,58 @@
+### User Registration
+POST http://localhost:5900/register
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "username": "testuser",
+  "password": "password123",
+  "profilePicture": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA"
+}
+
+### User Login
+POST http://localhost:5900/login
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+### Create a Post
+POST http://localhost:5900/posts
+Content-Type: application/json
+
+{
+  "userId": "67653afaccf857cd92955603",
+  "location": "Eiffel Tower",
+  "description": "Visited this iconic place!",
+  "timeOfVisit": "2024-12-20T15:30:00Z",
+  "photos": [
+    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/",
+    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD2/"
+  ],
+  "geotag": [2.2945, 48.8584]
+}
+
+### Get User Travel Map
+GET http://localhost:5900/users/67653afaccf857cd92955603/map
+
+### Browse Global Map
+GET http://localhost:5900/posts/nearby?longitude=2.2945&latitude=48.8584&maxDistance=5900
+
+### Update a Post
+PUT http://localhost:5900/posts/<INSERT_POST_ID>
+Content-Type: application/json
+
+{
+  "description": "Updated description!",
+  "photos": [
+    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/"
+  ]
+}
+
+### Delete a Post
+DELETE http://localhost:5900/posts/<INSERT_POST_ID>
+
+### Like a Post
+POST http://localhost:5900/posts/<INSERT_POST_ID>/like
