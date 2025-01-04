@@ -33,10 +33,12 @@ const PostSchema = new mongoose.Schema({
     description: String,
     timeOfVisit: Date,
     photos: [String], // Array of base64-encoded photos
-    geotag: { type: [Number], index: '2dsphere' }, // [longitude, latitude]
+    geotag: { 
+        type: { type: String, enum: ['Point'], required: true }, // GeoJSON type
+        coordinates: { type: [Number], required: true } // [longitude, latitude]
+    },
     likes: { type: Number, default: 0 }
 });
-
 const User = mongoose.model('User', UserSchema);
 const Post = mongoose.model('Post', PostSchema);
 
@@ -92,18 +94,20 @@ app.get('/users/:userId/map', async (req, res) => {
 });
 
 // Browse Global Map
-app.get('/posts/nearby', async (req, res) => {
+app.get('/posts', async (req, res) => {
     try {
-        const { longitude, latitude, maxDistance = 5000 } = req.query;
-        const posts = await Post.find({
-            geotag: {
-                $near: {
-                    $geometry: { type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] },
-                    $maxDistance: parseFloat(maxDistance)
-                }
-            }
-        });
-        res.status(200).json(posts);
+        const posts = await Post.find({})
+            .populate('userId', 'username')  // Populate the userId field with only 'username'
+            .exec();
+
+        // Transform the posts to include username directly in the post object, and remove the nested 'user' object
+        const postsWithUsername = posts.map(post => ({
+            ...post.toObject(),
+            username: post.userId.username,  // Add the username directly to the post object
+            userId: post.userId._id // Keep the userId as an ID, not as an object
+        }));
+
+        res.status(200).json(postsWithUsername);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
